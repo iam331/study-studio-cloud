@@ -43,7 +43,16 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac)}
 .pane{background:var(--pn);border:1px solid var(--bd);border-radius:10px;display:flex;flex-direction:column;min-height:0}
 .tb{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border-bottom:1px solid var(--bd);align-items:center}
 .tb select{width:auto;max-width:220px;padding:5px 8px}
-iframe{flex:1;width:100%;border:0;background:#fff;border-radius:0 0 10px 10px}
+.docview{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;background:#dbe4ee;border-radius:0 0 10px 10px}
+#fr{display:block;flex:1;width:100%;height:100%;min-height:0;border:0;background:#fff;border-radius:0}
+.pdfview{flex:1;min-height:0;overflow:auto;padding:12px;background:#475569;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
+.pdfview[hidden]{display:none!important}
+.pdfPageCanvas{display:block;max-width:100%;height:auto;background:#fff;margin:0 auto 12px;box-shadow:0 2px 12px rgba(0,0,0,.22)}
+.pdfStatus{padding:18px 10px;text-align:center;color:#0f172a;background:#e2e8f0;border-radius:8px;margin:4px auto;max-width:560px}
+.pdfNav{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;padding:7px;background:var(--pn2);border:1px solid var(--bd);border-radius:8px;margin:4px 0 8px}
+.pdfNav span{font-variant-numeric:tabular-nums;color:var(--tx);font-size:13px}
+.hwPdfWrap{display:flex;flex-direction:column;min-height:320px;height:62vh;max-height:700px;width:100%;margin-top:10px}
+.hwPdfWrap .pdfview{border-radius:8px}
 #ed{flex:1;overflow:auto;padding:16px;outline:0;line-height:1.7}
 #ed h2,#ed h3{font-family:Georgia,serif}
 .fx{font-family:Cambria,Georgia,serif;font-style:italic;background:#16294a;padding:1px 8px;border-radius:5px}
@@ -59,7 +68,30 @@ iframe{flex:1;width:100%;border:0;background:#fff;border-radius:0 0 10px 10px}
 .er{color:#fca5a5;min-height:20px;font-size:14px}
 #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ok);color:#041;padding:9px 16px;border-radius:8px;z-index:80;display:none;font-weight:600}
 #toast.err{background:var(--er);color:#fff}
-@media(max-width:900px){.ws{grid-template-columns:1fr;height:auto}.pane{height:70vh}}
+@media(max-width:900px){
+ main{padding:10px}
+ header{padding:10px}
+ header h1{font-size:18px}
+ .qa{width:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+ .qa .btn{white-space:nowrap;flex-shrink:0}
+ .ws{grid-template-columns:1fr;height:auto;min-height:0;gap:10px}
+ .pane{height:70vh;min-height:350px}
+ .tb select{max-width:100%;min-width:120px;flex:1}
+ .tb .btn{flex-shrink:0}
+ .sh .pills{flex-wrap:wrap}
+ .pdfview{padding:8px}
+}
+@media(max-width:480px){
+ body{font-size:14px}
+ main{padding:8px}
+ header{position:static}
+ .stat b{font-size:24px}
+ .pane{height:68dvh;min-height:300px}
+ .tb{padding:6px;gap:5px}
+ .btn.s{padding:6px 8px}
+ .box{padding:14px}
+ .hwPdfWrap{height:60dvh;min-height:280px}
+}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style></head>
 <body>
@@ -69,6 +101,7 @@ iframe{flex:1;width:100%;border:0;background:#fff;border-radius:0 0 10px 10px}
 <div class="ov" id="modal"></div><div class="ov" id="guard"></div>
 <div class="ov on" id="lock"><div class="box"><h2>Study Studio Cloud</h2><p style="margin:0;color:var(--mu)">Enter your passcode to sign in and sync your notes and files across devices. First-time cloud setup is required.</p><input class="in" id="lp" type="password" placeholder="Passcode" autocomplete="current-password"><div class="er" id="le"></div><button class="btn p" data-a="unlock">Sign in</button></div></div>
 <input type="file" id="fi" hidden><div id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -76,11 +109,14 @@ iframe{flex:1;width:100%;border:0;background:#fff;border-radius:0 0 10px 10px}
 'use strict';
 /* Firebase web config for my-study-studio-cloud. This tool uses the compat SDK globals below, so keep this config in the existing FIREBASE_CONFIG object rather than initializing a separate module app. Analytics measurementId is included but analytics is not required for login or cloud sync. */
 const FIREBASE_CONFIG={apiKey:'AIzaSyAq_TkY19nFalMXAsvSja5Cnvsri19AtXc',authDomain:'my-study-studio-cloud.firebaseapp.com',projectId:'my-study-studio-cloud',storageBucket:'my-study-studio-cloud.firebasestorage.app',messagingSenderId:'552888594111',appId:'1:552888594111:web:8e49d3b8b7ac925eafa00a',measurementId:'G-ZMV5PHVMEX'};
+if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
 /* This email is the fixed cloud account used internally; only its password is requested in the UI. */
 const OWNER_EMAIL='iamveer@study-studio.app';
 const CLOUD_CHUNK_CHARS=400000;
 let db,cloudAuth=null,cloudDb=null,cloudReady=false,cloudSetupError='',cloudSaveChain=Promise.resolve(),S={subjects:[],cards:[]},nav={v:'home'},urls=[],murls=[],q='',tm=null,gcb=null,ci=0,cf=false;
 const pomo={left:1500,id:null};
+let mainPdfId='',mainPdfDoc=null,mainPdfLoading=null,mainPdfRenderTask=null,mainPdfRenderToken=0;
+let hwPdfDoc=null,hwPdfPage=1,hwPdfRenderTask=null,hwPdfRenderToken=0;
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=s=>document.querySelector(s);
@@ -147,7 +183,7 @@ const save=()=>idb('app_state','readwrite',s=>s.put(S,'state')).then(async()=>{
 }).catch(e=>{toast('Local save failed: '+cloudError(e),1);return false});
 const putFile=async(id,o)=>{await idb('files','readwrite',s=>s.put(o,id));if(cloudReady){try{await cloudUploadFile(id,o)}catch(e){await idb('files','readwrite',s=>s.delete(id));throw e}}};
 const delFile=async id=>{if(cloudReady)await cloudDeleteFile(id);await idb('files','readwrite',s=>s.delete(id))};
-async function blobOf(id,store){let f=await idb('files','readonly',s=>s.get(id));if(!f&&cloudReady)f=await cloudDownloadFile(id);if(!f)return null;const u=URL.createObjectURL(new Blob([f.buf],{type:f.type}));store.push(u);return{url:u,type:f.type,name:f.name}}
+async function blobOf(id,store){let f=await idb('files','readonly',s=>s.get(id));if(!f&&cloudReady)f=await cloudDownloadFile(id);if(!f)return null;const u=URL.createObjectURL(new Blob([f.buf],{type:f.type}));store.push(u);return{id:String(id),url:u,type:f.type,name:f.name,buf:f.buf}}
 const revoke=a=>{a.splice(0).forEach(u=>URL.revokeObjectURL(u))};
 async function loadCloudStateOrMigrate(){
   const raw=await readTextChunks(stateChunksRef());
@@ -206,14 +242,40 @@ function vChapter(m){const s=getS(),c=getC();m.innerHTML=crumbs()+`<div class="s
 ${c.lectures.length?`<div class="rows">${c.lectures.map(l=>{const d=`data-s="${s.id}" data-c="${c.id}" data-l="${l.id}"`;return`<div class="row${l.done?' dn':''}"><input type="checkbox" aria-label="Completed" data-a="tog" data-k="l" ${d} ${l.done?'checked':''}><button class="nm" data-a="go" data-v="studio" ${d}>${esc(l.name)}</button><span class="meta">${l.materials.length} materials</span><span class="meta">${l.hw.length} homework</span><button class="btn s" data-a="hw" ${d}>Homework</button><button class="btn p s" data-a="go" data-v="studio" ${d}>Study</button><button class="btn dng s" data-a="del" data-k="l" ${d}>Delete</button></div>`}).join('')}</div>`:'<div class="empty">No lectures yet. Add a lecture to attach notes and files.</div>'}`}
 function vStudio(m){const l=getL(),md=nav.mode||'dual';if(!l.materials.find(x=>x.id===nav.mid))nav.mid=l.materials[0]&&l.materials[0].id;
 m.innerHTML=crumbs()+`<div class="sh"><h2>${esc(l.name)}</h2><div class="pills">${[['dual','Dual Split'],['reader','Reader Only'],['writer','Writer Only']].map(x=>`<button class="btn${md===x[0]?' on':''}" data-a="mode" data-m="${x[0]}">${x[1]}</button>`).join('')}</div></div>
-<div class="ws ${md}"><section class="pane" id="rd"><div class="tb">${l.materials.length?`<select class="in" id="ms">${l.materials.map(x=>`<option value="${x.id}"${x.id===nav.mid?' selected':''}>${esc(x.name)}</option>`).join('')}</select>`:''}<button class="btn s" data-a="up">＋ Upload Material</button><button class="btn s" data-a="tab"${nav.mid?'':' disabled'}>↗ Open in New Tab</button><button class="btn dng s" data-a="delmat"${nav.mid?'':' disabled'}>Delete Material</button><button class="btn s" data-a="pg" data-d="-1">‹</button><span id="pn" class="meta">1</span><button class="btn s" data-a="pg" data-d="1">›</button></div>${nav.mid?'<iframe id="fr" title="Material reader"></iframe>':'<div class="empty" style="margin:16px">No material yet. Upload a PDF, HTML or TXT file to read it here.</div>'}</section>
+<div class="ws ${md}"><section class="pane" id="rd"><div class="tb">${l.materials.length?`<select class="in" id="ms">${l.materials.map(x=>`<option value="${x.id}"${x.id===nav.mid?' selected':''}>${esc(x.name)}</option>`).join('')}</select>`:''}<button class="btn s" data-a="up">＋ Upload Material</button><button class="btn s" data-a="tab"${nav.mid?'':' disabled'}>↗ Open in New Tab</button><button class="btn dng s" data-a="delmat"${nav.mid?'':' disabled'}>Delete Material</button><button class="btn s" data-a="pg" data-d="-1">‹</button><span id="pn" class="meta">1</span><button class="btn s" data-a="pg" data-d="1">›</button></div>${nav.mid?'<div class="docview"><iframe id="fr" title="Material reader"></iframe><div id="pdfview" class="pdfview" hidden></div></div>':'<div class="empty" style="margin:16px">No material yet. Upload a PDF, HTML or TXT file to read it here.</div>'}</section>
 <section class="pane" id="wr"><div class="tb">${[['bold','B'],['italic','I'],['underline','U'],['h2','H2'],['h3','H3'],['ul','• List'],['ol','1. List'],['fx','📐'],['kc','💡'],['hr','―']].map(x=>`<button class="btn s" data-a="fmt" data-c="${x[0]}" title="${x[0]}">${x[1]}</button>`).join('')}<button class="btn s" data-a="print" style="margin-left:auto">Print / Export as PDF</button></div><div id="ed" contenteditable="true" spellcheck="true"></div><div class="ft"><span id="wc">0 words</span><span id="sv">Saved</span></div></section></div>`;
 const ed=$('#ed');ed.innerHTML=l.notes||'';wc();
 ed.oninput=()=>{wc();$('#sv').textContent='Saving…';clearTimeout(tm);tm=setTimeout(commit,300)};
 document.querySelectorAll('.tb button').forEach(b=>b.onmousedown=e=>e.preventDefault());
 const ms=$('#ms');if(ms)ms.onchange=()=>{nav.mid=ms.value;render()};
 nav.cur=null;nav.page=1;if(nav.mid)blobOf(nav.mid,urls).then(b=>{if(!b||!$('#fr'))return;nav.cur=b;frame()}).catch(e=>toast('Could not load file: '+cloudError(e),1))}
-function frame(){const f=$('#fr'),b=nav.cur;if(!f||!b)return;const pdf=b.type==='application/pdf';if(b.type==='text/html')f.setAttribute('sandbox','allow-scripts');else f.removeAttribute('sandbox');f.src=b.url+(pdf?'#page='+nav.page:'');$('#pn').textContent=pdf?nav.page:'–'}
+function pdfMessage(host,message){if(host)host.innerHTML=`<div class="pdfStatus">${esc(message)}</div>`}
+function canvasScale(page,host,maxDpr=1.5){const base=page.getViewport({scale:1}),available=Math.max(220,(host.clientWidth||320)-24),cssScale=Math.min(available/base.width,1.65),dpr=Math.min(window.devicePixelRatio||1,maxDpr);return{viewport:page.getViewport({scale:cssScale*dpr}),cssWidth:Math.round(base.width*cssScale),cssHeight:Math.round(base.height*cssScale)}}
+async function drawMainPdfPage(){
+ const b=nav.cur,host=$('#pdfview');if(!b||!host||host.hidden)return;
+ const token=++mainPdfRenderToken;
+ if(mainPdfRenderTask){try{mainPdfRenderTask.cancel()}catch(_){}}
+ pdfMessage(host,'Opening PDF preview…');
+ try{
+  if(!window.pdfjsLib)throw new Error('PDF preview library did not load. Check your internet connection and reload the page.');
+  if(mainPdfId!==b.id){mainPdfId=b.id;mainPdfDoc=null;mainPdfLoading=pdfjsLib.getDocument({data:new Uint8Array(b.buf)}).promise;}
+  const doc=mainPdfDoc||await mainPdfLoading;
+  if(token!==mainPdfRenderToken||!$('#pdfview')||nav.cur?.id!==b.id)return;
+  mainPdfDoc=doc;nav.page=Math.max(1,Math.min(nav.page,doc.numPages));
+  const page=await doc.getPage(nav.page);if(token!==mainPdfRenderToken)return;
+  const dim=canvasScale(page,host,1.5),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d',{alpha:false});
+  canvas.className='pdfPageCanvas';canvas.width=Math.ceil(dim.viewport.width);canvas.height=Math.ceil(dim.viewport.height);canvas.style.width=dim.cssWidth+'px';canvas.style.height=dim.cssHeight+'px';
+  host.replaceChildren(canvas);
+  const task=page.render({canvasContext:ctx,viewport:dim.viewport});mainPdfRenderTask=task;await task.promise;
+  if(token===mainPdfRenderToken)$('#pn').textContent=nav.page+' / '+doc.numPages;
+ }catch(e){if(e&&e.name==='RenderingCancelledException')return;if(token===mainPdfRenderToken){pdfMessage(host,'Could not display this PDF. Please check that the file is a valid PDF and reload the page.');$('#pn').textContent='PDF error';console.error('PDF preview error',e)}}
+}
+function frame(){
+ const f=$('#fr'),b=nav.cur,pv=$('#pdfview');if(!b)return;
+ const isPdf=b.type==='application/pdf'||/\.pdf$/i.test(b.name||'');
+ if(isPdf){if(!f||!pv)return;f.style.display='none';pv.hidden=false;drawMainPdfPage();return;}
+ if(!f)return;if(pv)pv.hidden=true;f.style.display='block';if(b.type==='text/html')f.setAttribute('sandbox','allow-scripts');else f.removeAttribute('sandbox');f.src=b.url;$('#pn').textContent='–';
+}
 function wc(){const t=$('#ed').innerText.trim();$('#wc').textContent=(t?t.split(/\s+/).length:0)+' words'}
 function commit(){tm=null;const ed=$('#ed');if(!ed||nav.v!=='studio')return;getL().notes=ed.innerHTML;save().then(ok=>{const s=$('#sv');if(s)s.textContent=ok?(cloudReady?'Synced to cloud':'Saved locally'):'Sync failed'})}
 function flush(){if(tm){clearTimeout(tm);commit()}}
@@ -229,7 +291,26 @@ function hwRows(l,s,c,full){return l.hw.map(h=>`<div class="row"><span class="nm
 function hwModal(){const s=getS(),c=getC(),l=getL();openM(`<h3>Homework: ${esc(l.name)}</h3><div class="rows">${l.hw.length?hwRows(l,s,c):'<div class="empty">No homework PDFs yet.</div>'}</div><div id="hv"></div><div class="row" style="justify-content:space-between;background:none;border:0"><button class="btn p" data-a="hwup">＋ Upload homework PDF</button><button class="btn" data-a="mx">Close</button></div>`,1)}
 function hwAll(){let h='';S.subjects.forEach(s=>s.chapters.forEach(c=>c.lectures.forEach(l=>{if(l.hw.length)h+=`<h3 style="font-size:16px;margin-top:8px">${esc(s.name)} / ${esc(c.name)} / ${esc(l.name)}</h3><div class="rows">${hwRows(l,s,c,1)}</div>`})));
 openM(`<h3>Homework Center</h3>${h||'<div class="empty">No homework uploaded yet. Add PDFs from a lecture row using Homework.</div>'}<div id="hv"></div><button class="btn" data-a="mx">Close</button>`,1)}
-async function hwView(id){const b=await blobOf(id,murls),v=$('#hv');if(!b||!v)return;v.innerHTML=`<iframe src="${b.url}" title="Homework viewer" style="height:60vh;width:100%;border-radius:8px"></iframe>`}
+async function drawHomeworkPdfPage(){
+ const host=$('#hw-pdf-view'),token=++hwPdfRenderToken;if(!host||!hwPdfDoc)return;
+ if(hwPdfRenderTask){try{hwPdfRenderTask.cancel()}catch(_){}}
+ pdfMessage(host,'Opening homework PDF…');
+ try{const doc=hwPdfDoc;hwPdfPage=Math.max(1,Math.min(hwPdfPage,doc.numPages));const page=await doc.getPage(hwPdfPage);if(token!==hwPdfRenderToken||!$('#hw-pdf-view'))return;
+ const dim=canvasScale(page,host,1.5),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d',{alpha:false});canvas.className='pdfPageCanvas';canvas.width=Math.ceil(dim.viewport.width);canvas.height=Math.ceil(dim.viewport.height);canvas.style.width=dim.cssWidth+'px';canvas.style.height=dim.cssHeight+'px';host.replaceChildren(canvas);
+ const task=page.render({canvasContext:ctx,viewport:dim.viewport});hwPdfRenderTask=task;await task.promise;if(token===hwPdfRenderToken){$('#hpn').textContent=hwPdfPage+' / '+doc.numPages;$('#hprev').disabled=hwPdfPage<=1;$('#hnext').disabled=hwPdfPage>=doc.numPages;}
+ }catch(e){if(e&&e.name==='RenderingCancelledException')return;if(token===hwPdfRenderToken)pdfMessage(host,'Could not display this PDF. Check the file and try again.');console.error('Homework PDF preview error',e)}
+}
+async function hwView(id){
+ const b=await blobOf(id,murls),v=$('#hv');if(!b||!v)return;
+ if(!window.pdfjsLib){v.innerHTML='<div class="pdfStatus">PDF viewer could not load. Check your internet connection and reload.</div>';return;}
+ v.innerHTML='<div class="hwPdfWrap"><div class="pdfNav"><button class="btn s" id="hprev" type="button">‹ Previous</button><span id="hpn">Loading…</span><button class="btn s" id="hnext" type="button">Next ›</button></div><div class="pdfview" id="hw-pdf-view"><div class="pdfStatus">Loading homework PDF…</div></div></div>';
+ hwPdfDoc=null;hwPdfPage=1;if(hwPdfRenderTask){try{hwPdfRenderTask.cancel()}catch(_){}}
+ try{hwPdfDoc=await pdfjsLib.getDocument({data:new Uint8Array(b.buf)}).promise;
+  $('#hprev').onclick=()=>{if(hwPdfPage>1){hwPdfPage--;drawHomeworkPdfPage()}};
+  $('#hnext').onclick=()=>{if(hwPdfDoc&&hwPdfPage<hwPdfDoc.numPages){hwPdfPage++;drawHomeworkPdfPage()}};
+  await drawHomeworkPdfPage();
+ }catch(e){pdfMessage($('#hw-pdf-view'),'Could not open this homework PDF. Check that the uploaded file is a valid PDF.');console.error('Homework PDF load error',e)}
+}
 function findLec(s,c,l){const S1=S.subjects.find(x=>x.id===s),C=S1.chapters.find(x=>x.id===c);return{S1,C,L:C.lectures.find(x=>x.id===l)}}
 /* ---------- Pomodoro / Cards / Backup ---------- */
 const mmss=n=>String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');
@@ -298,6 +379,7 @@ else if(a==='bkr')pick('.json',false,fs=>restoreB(fs[0]));
 });
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&$('#lock').classList.contains('on'))unlock();if(e.key==='Enter'&&$('#guard').classList.contains('on'))document.querySelector('[data-a=gok]').click();if(e.key==='Escape'){$('#guard').classList.remove('on');if($('#modal').classList.contains('on'))closeM()}});
 window.addEventListener('beforeunload',flush);
+window.addEventListener('resize',()=>{clearTimeout(window.__pdfResizeTimer);window.__pdfResizeTimer=setTimeout(()=>{if(nav.cur&&nav.cur.type==='application/pdf')drawMainPdfPage();if(hwPdfDoc&&$('#hw-pdf-view'))drawHomeworkPdfPage()},180)});
 (async function init(){try{db=await openDB();const s=await idb('app_state','readonly',st=>st.get('state'));if(s)S=s;}catch(e){toast('Local cache unavailable. Cloud storage may still work.',1)}
 try{await initCloud()}catch(e){cloudSetupError=e.message||String(e)}showLock();render()})();
 </script></body></html>
