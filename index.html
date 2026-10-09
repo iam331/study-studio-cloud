@@ -58,6 +58,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac)}
 .fx{font-family:Cambria,Georgia,serif;font-style:italic;background:#16294a;padding:1px 8px;border-radius:5px}
 .kc{border-left:4px solid var(--ac);background:#10213f;padding:8px 12px;margin:10px 0;border-radius:0 8px 8px 0}
 .ft{display:flex;justify-content:space-between;padding:6px 12px;border-top:1px solid var(--bd);color:var(--mu);font-size:13px}
+.writerContext{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:9px 12px;border-bottom:1px solid var(--bd)}.writerContext strong{display:block;font-size:14px}.writerContext small{display:block;color:var(--mu);font-size:12px;line-height:1.4}
 .ov{position:fixed;inset:0;background:rgba(3,8,16,.8);display:none;align-items:center;justify-content:center;z-index:20;padding:14px}
 .ov.on{display:flex}#guard{z-index:40}#lock{z-index:60;background:var(--bg)}
 .box{background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:20px;width:100%;max-width:440px;max-height:92vh;overflow:auto;display:flex;flex-direction:column;gap:10px}
@@ -240,15 +241,22 @@ function vSubject(m){const s=getS();m.innerHTML=crumbs()+`<div class="sh"><h2>${
 ${s.chapters.length?`<div class="rows">${s.chapters.map(c=>`<div class="row${cp(c)===100?' dn':''}"><input type="checkbox" aria-label="Completed" data-a="tog" data-k="c" data-s="${s.id}" data-c="${c.id}" ${cp(c)===100?'checked':''}><button class="nm" data-a="go" data-v="chapter" data-s="${s.id}" data-c="${c.id}">${esc(c.name)}</button><span class="meta">${c.lectures.length} lectures</span><span class="meta">${cp(c)===100?'Completed':'Pending'} (${cp(c)}%)</span><button class="btn dng s" data-a="del" data-k="c" data-s="${s.id}" data-c="${c.id}">Delete</button></div>`).join('')}</div>`:'<div class="empty">No chapters yet. Add one to start organizing lectures.</div>'}`}
 function vChapter(m){const s=getS(),c=getC();m.innerHTML=crumbs()+`<div class="sh"><h2>${esc(c.name)}</h2><button class="btn p" data-a="add" data-k="l" data-s="${s.id}" data-c="${c.id}">Add lecture</button></div><div class="pb"><i style="width:${cp(c)}%"></i></div>
 ${c.lectures.length?`<div class="rows">${c.lectures.map(l=>{const d=`data-s="${s.id}" data-c="${c.id}" data-l="${l.id}"`;return`<div class="row${l.done?' dn':''}"><input type="checkbox" aria-label="Completed" data-a="tog" data-k="l" ${d} ${l.done?'checked':''}><button class="nm" data-a="go" data-v="studio" ${d}>${esc(l.name)}</button><span class="meta">${l.materials.length} materials</span><span class="meta">${l.hw.length} homework</span><button class="btn s" data-a="hw" ${d}>Homework</button><button class="btn p s" data-a="go" data-v="studio" ${d}>Study</button><button class="btn dng s" data-a="del" data-k="l" ${d}>Delete</button></div>`}).join('')}</div>`:'<div class="empty">No lectures yet. Add a lecture to attach notes and files.</div>'}`}
-function vStudio(m){const l=getL(),md=nav.mode||'dual';if(!l.materials.find(x=>x.id===nav.mid))nav.mid=l.materials[0]&&l.materials[0].id;
-m.innerHTML=crumbs()+`<div class="sh"><h2>${esc(l.name)}</h2><div class="pills">${[['dual','Dual Split'],['reader','Reader Only'],['writer','Writer Only']].map(x=>`<button class="btn${md===x[0]?' on':''}" data-a="mode" data-m="${x[0]}">${x[1]}</button>`).join('')}</div></div>
+function vStudio(m){
+ const l=getL(),md=nav.mode||'dual';
+ if(!l.materials.find(x=>x.id===nav.mid))nav.mid=(l.materials[0]&&l.materials[0].id)||null;
+ if(!Number.isFinite(Number(nav.page))||Number(nav.page)<1)nav.page=1;
+ if(isPdfMaterial(l)){if(nav.noteScope!=='page'&&nav.noteScope!=='lecture')nav.noteScope='page'}else nav.noteScope='lecture';
+ nav.cur=null;
+ m.innerHTML=crumbs()+`<div class="sh"><h2>${esc(l.name)}</h2><div class="pills">${[['dual','Dual Split'],['reader','Reader Only'],['writer','Writer Only']].map(x=>`<button class="btn${md===x[0]?' on':''}" data-a="mode" data-m="${x[0]}">${x[1]}</button>`).join('')}</div></div>
 <div class="ws ${md}"><section class="pane" id="rd"><div class="tb">${l.materials.length?`<select class="in" id="ms">${l.materials.map(x=>`<option value="${x.id}"${x.id===nav.mid?' selected':''}>${esc(x.name)}</option>`).join('')}</select>`:''}<button class="btn s" data-a="up">＋ Upload Material</button><button class="btn s" data-a="tab"${nav.mid?'':' disabled'}>↗ Open in New Tab</button><button class="btn dng s" data-a="delmat"${nav.mid?'':' disabled'}>Delete Material</button><button class="btn s" data-a="pg" data-d="-1">‹</button><span id="pn" class="meta">1</span><button class="btn s" data-a="pg" data-d="1">›</button></div>${nav.mid?'<div class="docview"><iframe id="fr" title="Material reader"></iframe><div id="pdfview" class="pdfview" hidden></div></div>':'<div class="empty" style="margin:16px">No material yet. Upload a PDF, HTML or TXT file to read it here.</div>'}</section>
-<section class="pane" id="wr"><div class="tb">${[['bold','B'],['italic','I'],['underline','U'],['h2','H2'],['h3','H3'],['ul','• List'],['ol','1. List'],['fx','📐'],['kc','💡'],['hr','―']].map(x=>`<button class="btn s" data-a="fmt" data-c="${x[0]}" title="${x[0]}">${x[1]}</button>`).join('')}<button class="btn s" data-a="print" style="margin-left:auto">Print / Export as PDF</button></div><div id="ed" contenteditable="true" spellcheck="true"></div><div class="ft"><span id="wc">0 words</span><span id="sv">Saved</span></div></section></div>`;
-const ed=$('#ed');ed.innerHTML=l.notes||'';wc();
-ed.oninput=()=>{wc();$('#sv').textContent='Saving…';clearTimeout(tm);tm=setTimeout(commit,300)};
-document.querySelectorAll('.tb button').forEach(b=>b.onmousedown=e=>e.preventDefault());
-const ms=$('#ms');if(ms)ms.onchange=()=>{nav.mid=ms.value;render()};
-nav.cur=null;nav.page=1;if(nav.mid)blobOf(nav.mid,urls).then(b=>{if(!b||!$('#fr'))return;nav.cur=b;frame()}).catch(e=>toast('Could not load file: '+cloudError(e),1))}
+<section class="pane" id="wr"><div class="writerContext"><div><strong id="writerTitle">Lecture Notes</strong><small id="writerHelp">Your notes are saved automatically.</small></div><div id="writerScope"></div></div><div class="tb">${[['bold','B'],['italic','I'],['underline','U'],['h2','H2'],['h3','H3'],['ul','• List'],['ol','1. List'],['fx','📐'],['kc','💡'],['hr','―']].map(x=>`<button class="btn s" data-a="fmt" data-c="${x[0]}" title="${x[0]}">${x[1]}</button>`).join('')}<button class="btn s" data-a="print" style="margin-left:auto">Print / Export as PDF</button></div><div id="ed" contenteditable="true" spellcheck="true"></div><div class="ft"><span id="wc">0 words</span><span id="sv">Saved</span></div></section></div>`;
+ const ed=$('#ed');ed.innerHTML=activeNoteHTML(l);wc();updateWriterContext();
+ ed.oninput=()=>{wc();$('#sv').textContent='Saving…';clearTimeout(tm);tm=setTimeout(commit,300)};
+ document.querySelectorAll('.tb button').forEach(b=>b.onmousedown=e=>e.preventDefault());
+ const ms=$('#ms');if(ms)ms.onchange=()=>{flush();nav.mid=ms.value;nav.page=1;nav.noteScope='page';render()};
+ if(nav.mid)blobOf(nav.mid,urls).then(b=>{if(!b||!$('#fr'))return;nav.cur=b;frame()}).catch(e=>toast('Could not load file: '+cloudError(e),1))
+}
+
 function pdfMessage(host,message){if(host)host.innerHTML=`<div class="pdfStatus">${esc(message)}</div>`}
 function canvasScale(page,host,maxDpr=1.5){const base=page.getViewport({scale:1}),available=Math.max(220,(host.clientWidth||320)-24),cssScale=Math.min(available/base.width,1.65),dpr=Math.min(window.devicePixelRatio||1,maxDpr);return{viewport:page.getViewport({scale:cssScale*dpr}),cssWidth:Math.round(base.width*cssScale),cssHeight:Math.round(base.height*cssScale)}}
 async function drawMainPdfPage(){
@@ -270,22 +278,62 @@ async function drawMainPdfPage(){
   if(token===mainPdfRenderToken)$('#pn').textContent=nav.page+' / '+doc.numPages;
  }catch(e){if(e&&e.name==='RenderingCancelledException')return;if(token===mainPdfRenderToken){pdfMessage(host,'Could not display this PDF. Please check that the file is a valid PDF and reload the page.');$('#pn').textContent='PDF error';console.error('PDF preview error',e)}}
 }
+async function changeMainPage(delta){
+ flush();
+ let doc=mainPdfDoc;
+ if(!doc&&mainPdfLoading){try{doc=await mainPdfLoading;mainPdfDoc=doc}catch(_){}}
+ if(!doc){toast('PDF is still loading. Please try Next again.',1);return}
+ nav.page=Math.max(1,Math.min(doc.numPages,(Number(nav.page)||1)+Number(delta||0)));
+ loadWriterFromState();
+ drawMainPdfPage();
+}
 function frame(){
  const f=$('#fr'),b=nav.cur,pv=$('#pdfview');if(!b)return;
  const isPdf=b.type==='application/pdf'||/\.pdf$/i.test(b.name||'');
  if(isPdf){if(!f||!pv)return;f.style.display='none';pv.hidden=false;drawMainPdfPage();return;}
  if(!f)return;if(pv)pv.hidden=true;f.style.display='block';if(b.type==='text/html')f.setAttribute('sandbox','allow-scripts');else f.removeAttribute('sandbox');f.src=b.url;$('#pn').textContent='–';
 }
-function wc(){const t=$('#ed').innerText.trim();$('#wc').textContent=(t?t.split(/\s+/).length:0)+' words'}
-function commit(){tm=null;const ed=$('#ed');if(!ed||nav.v!=='studio')return;getL().notes=ed.innerHTML;save().then(ok=>{const s=$('#sv');if(s)s.textContent=ok?(cloudReady?'Synced to cloud':'Saved locally'):'Sync failed'})}
+function isPdfMaterial(l=getL()){
+ const mat=(l&&l.materials||[]).find(x=>x.id===nav.mid);
+ return !!(mat&&((mat.type||'')==='application/pdf'||/\.pdf$/i.test(mat.name||'')));
+}
+// PDF notes are stored under lecture.slideNotes[materialId][pageNumber], so each page has independent notes and cloud sync uses the existing state saver.
+function activeNoteHTML(l=getL()){
+ if(isPdfMaterial(l)&&nav.noteScope!=='lecture'){
+  if(!l.slideNotes||typeof l.slideNotes!=='object')l.slideNotes={};
+  const mk=String(nav.mid),pk=String(Math.max(1,Number(nav.page)||1));
+  if(!l.slideNotes[mk]||typeof l.slideNotes[mk]!=='object')l.slideNotes[mk]={};
+  return l.slideNotes[mk][pk]||'';
+ }
+ return l.notes||'';
+}
+function updateWriterContext(){
+ const l=getL(),pdf=isPdfMaterial(l),pageMode=pdf&&nav.noteScope!=='lecture';
+ const title=$('#writerTitle'),help=$('#writerHelp'),scope=$('#writerScope');
+ if(title)title.textContent=pageMode?`Slide ${Math.max(1,Number(nav.page)||1)} Notes`:'Lecture Notes';
+ if(help)help.textContent=pageMode?`Notes for ${((l.materials||[]).find(x=>x.id===nav.mid)||{}).name||'this PDF'}, page ${Math.max(1,Number(nav.page)||1)}. Autosaves and syncs across devices.`:'General notes for this lecture. Autosaves and syncs across devices.';
+ if(scope)scope.innerHTML=pdf?(pageMode?'<button class="btn s" data-a="noteScope" data-scope="lecture">Lecture-wide notes</button>':'<button class="btn s" data-a="noteScope" data-scope="page">Back to slide notes</button>'):'';
+}
+function loadWriterFromState(){const ed=$('#ed');if(!ed)return;ed.innerHTML=activeNoteHTML();wc();updateWriterContext();const status=$('#sv');if(status)status.textContent='Saved'}
+function wc(){const ed=$('#ed');if(!ed)return;const t=ed.innerText.trim();$('#wc').textContent=(t?t.split(/\s+/).length:0)+' words'}
+function commit(){
+ tm=null;const ed=$('#ed');if(!ed||nav.v!=='studio')return;
+ const l=getL();
+ if(isPdfMaterial(l)&&nav.noteScope!=='lecture'){
+  if(!l.slideNotes||typeof l.slideNotes!=='object')l.slideNotes={};
+  const mk=String(nav.mid),pk=String(Math.max(1,Number(nav.page)||1));
+  if(!l.slideNotes[mk]||typeof l.slideNotes[mk]!=='object')l.slideNotes[mk]={};
+  l.slideNotes[mk][pk]=ed.innerHTML;
+ }else l.notes=ed.innerHTML;
+ save().then(ok=>{const s=$('#sv');if(s)s.textContent=ok?(cloudReady?'Synced to cloud':'Saved locally'):'Sync failed'});
+}
 function flush(){if(tm){clearTimeout(tm);commit()}}
 function fmt(c){$('#ed').focus();const x=document.execCommand.bind(document);
 if(c==='bold'||c==='italic'||c==='underline')x(c);else if(c==='h2'||c==='h3')x('formatBlock',false,c);else if(c==='ul')x('insertUnorderedList');else if(c==='ol')x('insertOrderedList');else if(c==='hr')x('insertHorizontalRule');
 else if(c==='fx'){const v=prompt('Formula (for example: a² + b² = c²)');if(v)x('insertHTML',false,`<span class="fx">${esc(v)}</span>&nbsp;`)}
 else if(c==='kc')x('insertHTML',false,'<div class="kc"><b>Key concept:</b> Write it here.</div><p><br></p>');
 $('#ed').dispatchEvent(new Event('input'))}
-function printNotes(){const l=getL(),w=window.open('','_blank');if(!w)return toast('Allow pop-ups to print',1);
-w.document.write(`<!DOCTYPE html><title>${esc(l.name)}</title><style>body{font:16px/1.7 Georgia,serif;max-width:760px;margin:30px auto;padding:0 20px;color:#111}h1{border-bottom:2px solid #2563eb;padding-bottom:6px}.fx{font-style:italic;background:#eef2ff;padding:1px 6px}.kc{border-left:4px solid #2563eb;background:#eef2ff;padding:8px 12px;margin:10px 0}</style><h1>${esc(l.name)}</h1>${l.notes||''}`);w.document.close();w.focus();setTimeout(()=>w.print(),300)}
+function printNotes(){flush();const l=getL(),w=window.open('','_blank');if(!w)return toast('Allow pop-ups to print',1);const pageMode=isPdfMaterial(l)&&nav.noteScope!=='lecture',title=pageMode?`${l.name} — Page ${Math.max(1,Number(nav.page)||1)}`:l.name;w.document.write(`<!DOCTYPE html><title>${esc(title)}</title><style>body{font:16px/1.7 Georgia,serif;max-width:760px;margin:30px auto;padding:0 20px;color:#111}h1{border-bottom:2px solid #2563eb;padding-bottom:6px}.fx{font-style:italic;background:#eef2ff;padding:1px 6px}.kc{border-left:4px solid #2563eb;background:#eef2ff;padding:8px 12px;margin:10px 0}</style><h1>${esc(title)}</h1>${activeNoteHTML(l)}`);w.document.close();w.focus();setTimeout(()=>w.print(),300)}
 /* ---------- Homework ---------- */
 function hwRows(l,s,c,full){return l.hw.map(h=>`<div class="row"><span class="nm" style="font-size:15px">${esc(h.name)}</span><button class="btn s" data-a="hwv" data-id="${h.id}">View</button><button class="btn dng s" data-a="hwd" data-s="${s.id}" data-c="${c.id}" data-l="${l.id}" data-id="${h.id}" data-full="${full?1:0}">Delete</button></div>`).join('')}
 function hwModal(){const s=getS(),c=getC(),l=getL();openM(`<h3>Homework: ${esc(l.name)}</h3><div class="rows">${l.hw.length?hwRows(l,s,c):'<div class="empty">No homework PDFs yet.</div>'}</div><div id="hv"></div><div class="row" style="justify-content:space-between;background:none;border:0"><button class="btn p" data-a="hwup">＋ Upload homework PDF</button><button class="btn" data-a="mx">Close</button></div>`,1)}
@@ -341,7 +389,7 @@ if(k==='s')S.subjects=S.subjects.filter(x=>x!==s);else if(k==='c')s.chapters=s.c
 await save();if(nav.v==='home')nav={v:'home'};render();toast('Deleted')})}
 function upload(accept,multi,L,key,after){pick(accept,multi,async fs=>{let added=false;for(const f of fs){const id=uid(),ext=f.name.split('.').pop().toLowerCase(),type=ext==='pdf'?'application/pdf':(ext==='html'||ext==='htm')?'text/html':'text/plain';
 if(key==='hw'&&type!=='application/pdf'){toast('Homework must be a PDF',1);continue}
-try{await putFile(id,{name:f.name,type,buf:await f.arrayBuffer()});L[key].push({id,name:f.name,type});if(key==='materials')nav.mid=id;added=true}catch(err){toast('File upload failed: '+cloudError(err)+'. The file was not added.',1);break}}
+try{await putFile(id,{name:f.name,type,buf:await f.arrayBuffer()});L[key].push({id,name:f.name,type});if(key==='materials'){nav.mid=id;nav.page=1;nav.noteScope='page'}added=true}catch(err){toast('File upload failed: '+cloudError(err)+'. The file was not added.',1);break}}
 if(added){await save();after()}})}
 document.addEventListener('click',async e=>{const t=e.target.closest('[data-a]');if(!t)return;const d=t.dataset,a=d.a;
 if(a==='go'){flush();nav={v:d.v,s:d.s,c:d.c,l:d.l};render()}
@@ -359,7 +407,8 @@ else if(a==='mode'){nav.mode=d.m;render()}
 else if(a==='up')upload('.pdf,.html,.htm,.txt',true,getL(),'materials',render);
 else if(a==='tab'&&nav.cur)window.open(nav.cur.url,'_blank');
 else if(a==='delmat'){const l=getL(),m=l.materials.find(x=>x.id===nav.mid);if(m)guard(`"${m.name}"`,async()=>{await delFile(m.id);l.materials=l.materials.filter(x=>x!==m);nav.mid=null;await save();render();toast('Material deleted')})}
-else if(a==='pg'){if(nav.cur&&nav.cur.type==='application/pdf'){nav.page=Math.max(1,nav.page+ +d.d);frame()}}
+else if(a==='pg'){if(nav.cur&&isPdfMaterial(getL()))await changeMainPage(+d.d)}
+else if(a==='noteScope'){flush();nav.noteScope=d.scope==='lecture'?'lecture':'page';loadWriterFromState()}
 else if(a==='fmt')fmt(d.c)
 else if(a==='print')printNotes();
 else if(a==='hw'){nav.s=d.s;nav.c=d.c;nav.l=d.l;hwModal()}
