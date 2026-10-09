@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Class 10 Study Studio Pro</title>
+<style>
+:root{--bg:#07111f;--pn:#0d1726;--pn2:#13213a;--ac:#2563eb;--tx:#e6edf7;--mu:#8aa0bd;--bd:#1e3050;--ok:#22c55e;--er:#ef4444}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3{font-family:Georgia,"Iowan Old Style",serif;margin:0;font-weight:600}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid #6ea0ff;outline-offset:2px}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--pn);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:5}
+header h1{font-size:20px;cursor:pointer}
+.qa{display:flex;flex-wrap:wrap;gap:6px}
+.btn{background:var(--pn2);border:1px solid var(--bd);border-radius:8px;padding:7px 12px;transition:.15s}
+.btn:hover{border-color:var(--ac)}.btn.p{background:var(--ac);border-color:var(--ac)}.btn.dng{color:#fca5a5}.btn.dng:hover{border-color:var(--er)}
+.btn.s{padding:4px 9px;font-size:13px}.btn[disabled]{opacity:.4;cursor:default}
+main{padding:18px;max-width:1500px;margin:auto}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--pn);border:1px solid var(--bd);border-radius:10px;padding:12px 14px}
+.stat b{display:block;font:600 28px Georgia,serif}.stat span{color:var(--mu);font-size:13px}
+.bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.in{background:#0a1423;border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:8px 11px;font:inherit;width:100%}
+.bar .in{flex:1;min-width:220px;width:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card,.row{background:var(--pn);border:1px solid var(--bd);border-radius:10px}
+.card{padding:16px}.card h3{font-size:19px;margin-bottom:6px}
+.meta{color:var(--mu);font-size:13px;display:flex;gap:12px;flex-wrap:wrap}
+.pb{height:7px;background:#0a1423;border-radius:5px;overflow:hidden;margin:10px 0}.pb i{display:block;height:100%;background:var(--ac);transition:width .3s}
+.acts{display:flex;gap:6px;margin-top:10px}
+.rows{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:10px;padding:10px 12px;flex-wrap:wrap}
+.row .nm{flex:1;min-width:140px;background:none;border:0;text-align:left;font-size:16px}.row .nm:hover{color:#8ab4ff}
+.row.dn .nm{text-decoration:line-through;color:var(--mu)}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac)}
+.crumb{color:var(--mu);margin-bottom:12px;font-size:14px;display:flex;flex-wrap:wrap;gap:4px}
+.crumb button{background:none;border:0;color:#8ab4ff;padding:0}.crumb span{color:var(--tx)}
+.empty{color:var(--mu);padding:30px;text-align:center;border:1px dashed var(--bd);border-radius:10px}
+.sh{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.pills{display:flex;gap:6px}.pills .btn.on{background:var(--ac);border-color:var(--ac)}
+.ws{display:grid;grid-template-columns:1fr 1fr;gap:14px;height:calc(100vh - 190px);min-height:480px}
+.ws.reader,.ws.writer{grid-template-columns:1fr}.ws.reader #wr,.ws.writer #rd{display:none}
+.pane{background:var(--pn);border:1px solid var(--bd);border-radius:10px;display:flex;flex-direction:column;min-height:0}
+.tb{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border-bottom:1px solid var(--bd);align-items:center}
+.tb select{width:auto;max-width:220px;padding:5px 8px}
+iframe{flex:1;width:100%;border:0;background:#fff;border-radius:0 0 10px 10px}
+#ed{flex:1;overflow:auto;padding:16px;outline:0;line-height:1.7}
+#ed h2,#ed h3{font-family:Georgia,serif}
+.fx{font-family:Cambria,Georgia,serif;font-style:italic;background:#16294a;padding:1px 8px;border-radius:5px}
+.kc{border-left:4px solid var(--ac);background:#10213f;padding:8px 12px;margin:10px 0;border-radius:0 8px 8px 0}
+.ft{display:flex;justify-content:space-between;padding:6px 12px;border-top:1px solid var(--bd);color:var(--mu);font-size:13px}
+.ov{position:fixed;inset:0;background:rgba(3,8,16,.8);display:none;align-items:center;justify-content:center;z-index:20;padding:14px}
+.ov.on{display:flex}#guard{z-index:40}#lock{z-index:60;background:var(--bg)}
+.box{background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:20px;width:100%;max-width:440px;max-height:92vh;overflow:auto;display:flex;flex-direction:column;gap:10px}
+.box.w{max-width:860px}
+.box .row{background:var(--pn2)}
+.fc{min-height:170px;display:flex;align-items:center;justify-content:center;text-align:center;font:22px Georgia,serif;background:var(--pn2);border:1px solid var(--bd);border-radius:12px;padding:20px;cursor:pointer}
+.big{font:600 56px Georgia,serif;text-align:center}
+.er{color:#fca5a5;min-height:20px;font-size:14px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ok);color:#041;padding:9px 16px;border-radius:8px;z-index:80;display:none;font-weight:600}
+#toast.err{background:var(--er);color:#fff}
+@media(max-width:900px){.ws{grid-template-columns:1fr;height:auto}.pane{height:70vh}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body>
+<header><h1 data-a="go" data-v="home">Class 10 Study Studio Pro</h1>
+<div class="qa"><button class="btn" data-a="pomo">Pomodoro</button><button class="btn" data-a="cards">Flashcards</button><button class="btn" data-a="bk">Backup / Restore</button><button class="btn" data-a="hwall">HW Center</button><button class="btn" data-a="lock">Lock Studio</button></div></header>
+<main id="main"></main>
+<div class="ov" id="modal"></div><div class="ov" id="guard"></div>
+<div class="ov on" id="lock"><div class="box"><h2>Study Studio Cloud</h2><p style="margin:0;color:var(--mu)">Enter your passcode to sign in and sync your notes and files across devices. First-time cloud setup is required.</p><input class="in" id="lp" type="password" placeholder="Passcode" autocomplete="current-password"><div class="er" id="le"></div><button class="btn p" data-a="unlock">Sign in</button></div></div>
+<input type="file" id="fi" hidden><div id="toast"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+'use strict';
+/* Firebase web config for my-study-studio-cloud. This tool uses the compat SDK globals below, so keep this config in the existing FIREBASE_CONFIG object rather than initializing a separate module app. Analytics measurementId is included but analytics is not required for login or cloud sync. */
+const FIREBASE_CONFIG={apiKey:'AIzaSyAq_TkY19nFalMXAsvSja5Cnvsri19AtXc',authDomain:'my-study-studio-cloud.firebaseapp.com',projectId:'my-study-studio-cloud',storageBucket:'my-study-studio-cloud.firebasestorage.app',messagingSenderId:'552888594111',appId:'1:552888594111:web:8e49d3b8b7ac925eafa00a',measurementId:'G-ZMV5PHVMEX'};
+/* This email is the fixed cloud account used internally; only its password is requested in the UI. */
+const OWNER_EMAIL='iamveer@study-studio.app';
+const CLOUD_CHUNK_CHARS=400000;
+let db,cloudAuth=null,cloudDb=null,cloudReady=false,cloudSetupError='',cloudSaveChain=Promise.resolve(),S={subjects:[],cards:[]},nav={v:'home'},urls=[],murls=[],q='',tm=null,gcb=null,ci=0,cf=false;
+const pomo={left:1500,id:null};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=s=>document.querySelector(s);
+function toast(m,err){const t=$('#toast');t.textContent=m;t.className=err?'err':'';t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',2600)}
+/* ---------- Local cache + Firebase cloud ---------- */
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open('StudyStudioDB_v5',5);
+r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains('app_state'))d.createObjectStore('app_state');if(!d.objectStoreNames.contains('files'))d.createObjectStore('files')};
+r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function idb(st,mode,fn){return new Promise((res,rej)=>{const t=db.transaction(st,mode),r=fn(t.objectStore(st));t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)})}
+function stateChunksRef(){return cloudDb.collection('cloudData').doc('state').collection('chunks')}
+function fileRef(id){return cloudDb.collection('cloudData').doc('files').collection('items').doc(String(id))}
+async function replaceTextChunks(colRef,value){
+  const old=await colRef.get(),text=String(value),parts=[];
+  for(let i=0;i<text.length;i+=CLOUD_CHUNK_CHARS)parts.push(text.slice(i,i+CLOUD_CHUNK_CHARS));
+  if(!parts.length)parts.push('');
+  const operations=[];
+  parts.forEach((part,i)=>operations.push({kind:'set',ref:colRef.doc('c'+String(i).padStart(6,'0')),data:{i,text:part}}));
+  old.docs.forEach(d=>{const n=Number(d.id.slice(1));if(d.id.startsWith('c')&&Number.isInteger(n)&&n>=parts.length)operations.push({kind:'delete',ref:d.ref});});
+  /* Keep each batch below Firestore's request-size limit even when every text chunk is large. */
+  for(let i=0;i<operations.length;i+=10){const batch=cloudDb.batch();operations.slice(i,i+10).forEach(op=>op.kind==='set'?batch.set(op.ref,op.data):batch.delete(op.ref));await batch.commit();}
+  return parts.length;
+}
+async function readTextChunks(colRef){const snap=await colRef.get();return snap.docs.map(d=>({i:Number(d.data().i)||0,text:String(d.data().text||'')})).sort((a,b)=>a.i-b.i).map(x=>x.text).join('')}
+async function initCloud(){
+  if(!window.firebase)throw new Error('Firebase SDK did not load. Check your internet connection.');
+  const required=['apiKey','authDomain','projectId','appId'];
+  if(required.some(k=>!FIREBASE_CONFIG[k]||String(FIREBASE_CONFIG[k]).includes('PASTE_')))throw new Error('Cloud setup incomplete: add your Firebase web config in the HTML file. Follow CLOUD_SETUP.md.');
+  if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+  cloudAuth=firebase.auth();cloudDb=firebase.firestore();
+  await cloudAuth.signOut().catch(()=>{});
+}
+function cloudError(e){
+  const c=e&&e.code||'';
+  if(c==='auth/invalid-credential'||c==='auth/wrong-password'||c==='auth/user-not-found'||c==='auth/invalid-email')return 'Wrong passcode, or the owner account has not been created yet.';
+  if(c==='auth/operation-not-allowed')return 'Enable Email/Password in Firebase Authentication sign-in providers.';
+  if(c==='auth/unauthorized-domain')return 'Add your website host (for example username.github.io) to Firebase Authorized domains.';
+  if(c==='permission-denied'||c==='firestore/permission-denied')return 'Cloud access blocked. Check the Firestore security rules in CLOUD_SETUP.md.';
+  if(c==='unavailable'||c==='network-request-failed')return 'Network error. Check your internet connection and try again.';
+  return e&&e.message?e.message:'Unknown cloud error. Check Firebase setup.';
+}
+async function cloudUploadFile(id,o){
+  if(!cloudReady)throw new Error('Cloud sign-in required.');
+  const ref=fileRef(id),encoded=b64(o.buf),count=await replaceTextChunks(ref.collection('chunks'),encoded);
+  await ref.set({name:o.name||'file',type:o.type||'application/octet-stream',size:o.buf?o.buf.byteLength:0,chunkCount:count,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+}
+async function cloudDownloadFile(id){
+  if(!cloudReady)throw new Error('Cloud sign-in required.');
+  const ref=fileRef(id),meta=await ref.get();if(!meta.exists)return null;
+  const m=meta.data(),encoded=await readTextChunks(ref.collection('chunks'));
+  const f={name:m.name||'file',type:m.type||'application/octet-stream',buf:unb64(encoded)};
+  await idb('files','readwrite',s=>s.put(f,id));return f;
+}
+async function cloudDeleteFile(id){
+  if(!cloudReady)return;
+  const ref=fileRef(id),chunks=await ref.collection('chunks').get();
+  for(let i=0;i<chunks.docs.length;i+=400){const batch=cloudDb.batch();chunks.docs.slice(i,i+400).forEach(d=>batch.delete(d.ref));await batch.commit();}
+  await ref.delete();
+}
+const save=()=>idb('app_state','readwrite',s=>s.put(S,'state')).then(async()=>{
+  if(!cloudReady)return true;
+  const snapshot=JSON.stringify(S);
+  const task=cloudSaveChain.catch(()=>{}).then(()=>replaceTextChunks(stateChunksRef(),snapshot));cloudSaveChain=task;
+  try{await task;return true}catch(e){toast('Cloud sync failed: '+cloudError(e),1);return false;}
+}).catch(e=>{toast('Local save failed: '+cloudError(e),1);return false});
+const putFile=async(id,o)=>{await idb('files','readwrite',s=>s.put(o,id));if(cloudReady){try{await cloudUploadFile(id,o)}catch(e){await idb('files','readwrite',s=>s.delete(id));throw e}}};
+const delFile=async id=>{if(cloudReady)await cloudDeleteFile(id);await idb('files','readwrite',s=>s.delete(id))};
+async function blobOf(id,store){let f=await idb('files','readonly',s=>s.get(id));if(!f&&cloudReady)f=await cloudDownloadFile(id);if(!f)return null;const u=URL.createObjectURL(new Blob([f.buf],{type:f.type}));store.push(u);return{url:u,type:f.type,name:f.name}}
+const revoke=a=>{a.splice(0).forEach(u=>URL.revokeObjectURL(u))};
+async function loadCloudStateOrMigrate(){
+  const raw=await readTextChunks(stateChunksRef());
+  if(raw){const loaded=JSON.parse(raw);if(!loaded||!Array.isArray(loaded.subjects))throw new Error('The cloud state is invalid. Restore a known-good backup.');S=loaded;if(!Array.isArray(S.cards))S.cards=[];/* Cloud is authoritative after first sync; drop potentially stale device-local file copies. */await idb('files','readwrite',st=>st.clear());await idb('app_state','readwrite',st=>st.put(S,'state'));return;}
+  const local=await idb('app_state','readonly',st=>st.get('state'));if(local)S=local;
+  if(!Array.isArray(S.subjects))S.subjects=[];if(!Array.isArray(S.cards))S.cards=[];
+  /* First sign-in on the old browser migrates locally saved files to the cloud. */
+  const ids=[...new Set(S.subjects.flatMap(fidsS))];
+  for(const id of ids){const f=await idb('files','readonly',st=>st.get(id));if(f)await cloudUploadFile(id,f);}
+  await replaceTextChunks(stateChunksRef(),JSON.stringify(S));
+  await idb('app_state','readwrite',st=>st.put(S,'state'));
+}
+/* ---------- Helpers ---------- */
+const getS=()=>S.subjects.find(x=>x.id===nav.s),getC=()=>getS().chapters.find(x=>x.id===nav.c),getL=()=>getC().lectures.find(x=>x.id===nav.l);
+const cp=c=>c.lectures.length?Math.round(100*c.lectures.filter(l=>l.done).length/c.lectures.length):(c.done?100:0);
+const sp=s=>s.chapters.length?Math.round(s.chapters.reduce((a,c)=>a+cp(c),0)/s.chapters.length):0;
+const lecs=s=>s.chapters.reduce((a,c)=>a+c.lectures.length,0);
+const fids=l=>l.materials.map(m=>m.id).concat(l.hw.map(m=>m.id));
+const fidsC=c=>c.lectures.flatMap(fids),fidsS=s=>s.chapters.flatMap(fidsC);
+function pick(accept,multi,cb){const f=$('#fi');f.value='';f.accept=accept;f.multiple=!!multi;f.onchange=()=>{if(f.files.length)cb([...f.files])};f.click()}
+function ask(title,cb){openM(`<h3>${esc(title)}</h3><input class="in" id="ai" maxlength="120"><div class="row" style="justify-content:flex-end;background:none;border:0"><button class="btn" data-a="mx">Cancel</button><button class="btn p" id="aok">Add</button></div>`);
+const i=$('#ai'),go=()=>{const v=i.value.trim();if(!v)return;closeM();cb(v)};i.focus();i.onkeydown=e=>{if(e.key==='Enter')go()};$('#aok').onclick=go}
+function openM(h,wide){revoke(murls);$('#modal').innerHTML=`<div class="box${wide?' w':''}">${h}</div>`;$('#modal').classList.add('on')}
+function closeM(){$('#modal').classList.remove('on');$('#modal').innerHTML='';revoke(murls)}
+function guard(label,cb){gcb=cb;$('#guard').innerHTML=`<div class="box"><h3>Confirm deletion</h3><p style="margin:0;color:var(--mu)">${esc(label)} will be permanently deleted. Enter the same account passcode in both fields. The password is verified with Firebase.</p><input class="in" id="g1" type="password" placeholder="Password Check 1" autocomplete="off"><input class="in" id="g2" type="password" placeholder="Password Check 2" autocomplete="off"><div class="row" style="justify-content:flex-end;background:none;border:0"><button class="btn" data-a="gx">Cancel</button><button class="btn dng" data-a="gok">Delete</button></div></div>`;$('#guard').classList.add('on');$('#g1').focus()}
+/* ---------- Cloud sign-in ---------- */
+function showLock(){$('#lock').classList.add('on');$('#lp').value='';$('#le').textContent=cloudSetupError?cloudError(new Error(cloudSetupError)):''}
+async function unlock(){
+  const password=$('#lp').value;$('#le').textContent='';if(!password){$('#le').textContent='Enter your passcode.';return;}
+  if(cloudSetupError){$('#le').textContent=cloudError(new Error(cloudSetupError));return;}
+  try{
+    if(!cloudAuth||!cloudDb)await initCloud();
+    const result=await cloudAuth.signInWithEmailAndPassword(OWNER_EMAIL,password);
+    if(!result.user||result.user.email!==OWNER_EMAIL)throw new Error('This account is not the configured owner account.');
+    cloudReady=true;await loadCloudStateOrMigrate();$('#lock').classList.remove('on');render();toast('Signed in. Cloud sync is ready.');
+  }catch(e){cloudReady=false;$('#le').textContent=cloudError(e);}
+}
+/* ---------- Views ---------- */
+function crumbs(){let h='<button data-a="go" data-v="home">Home</button>';
+if(nav.s){const s=getS();h+=' &gt; '+(nav.c?`<button data-a="go" data-v="subject" data-s="${s.id}">${esc(s.name)}</button>`:`<span>${esc(s.name)}</span>`)}
+if(nav.c){const c=getC();h+=' &gt; '+(nav.l?`<button data-a="go" data-v="chapter" data-s="${nav.s}" data-c="${c.id}">${esc(c.name)}</button>`:`<span>${esc(c.name)}</span>`)}
+if(nav.l)h+=` &gt; <span>${esc(getL().name)}</span>`;return`<div class="crumb">${h}</div>`}
+function render(){flush();revoke(urls);const m=$('#main');({home:vHome,subject:vSubject,chapter:vChapter,studio:vStudio})[nav.v](m);window.scrollTo(0,0)}
+function vHome(m){const n=S.subjects.length,ch=S.subjects.reduce((a,s)=>a+s.chapters.length,0),lc=S.subjects.reduce((a,s)=>a+lecs(s),0);
+const fl=S.subjects.reduce((a,s)=>a+fidsS(s).length,0);
+m.innerHTML=`<div class="stats">${[['Subjects',n],['Chapters',ch],['Lectures',lc],['Uploaded files',fl]].map(x=>`<div class="stat"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('')}</div>
+<div class="bar"><input class="in" id="q" placeholder="Search subjects, chapters and lectures" value="${esc(q)}"><button class="btn p" data-a="add" data-k="s">Add subject</button></div><div id="res"></div>`;
+$('#q').oninput=e=>{q=e.target.value;res()};res()}
+function res(){const r=$('#res'),t=q.trim().toLowerCase();
+if(t){const o=[];S.subjects.forEach(s=>{if(s.name.toLowerCase().includes(t))o.push(['Subject',s.name,{v:'subject',s:s.id}]);s.chapters.forEach(c=>{if(c.name.toLowerCase().includes(t))o.push(['Chapter',s.name+' / '+c.name,{v:'chapter',s:s.id,c:c.id}]);c.lectures.forEach(l=>{if(l.name.toLowerCase().includes(t))o.push(['Lecture',s.name+' / '+c.name+' / '+l.name,{v:'studio',s:s.id,c:c.id,l:l.id}])})})});
+r.innerHTML=o.length?`<div class="rows">${o.map(x=>`<div class="row"><span class="meta">${x[0]}</span><button class="nm" data-a="go" ${Object.entries(x[2]).map(([k,v])=>`data-${k}="${v}"`).join(' ')}>${esc(x[1])}</button></div>`).join('')}</div>`:'<div class="empty">No matches. Try a different word.</div>';return}
+r.innerHTML=S.subjects.length?`<div class="grid">${S.subjects.map(s=>`<div class="card"><h3>${esc(s.name)}</h3><div class="meta"><span>${s.chapters.length} chapters</span><span>${lecs(s)} lectures</span><span>${sp(s)}% done</span></div><div class="pb"><i style="width:${sp(s)}%"></i></div><div class="acts"><button class="btn p s" data-a="go" data-v="subject" data-s="${s.id}">Open</button><button class="btn s" data-a="add" data-k="c" data-s="${s.id}">Add chapter</button><button class="btn dng s" data-a="del" data-k="s" data-s="${s.id}">Delete</button></div></div>`).join('')}</div>`:'<div class="empty">No subjects yet. Add your first subject to begin.</div>'}
+function vSubject(m){const s=getS();m.innerHTML=crumbs()+`<div class="sh"><h2>${esc(s.name)}</h2><button class="btn p" data-a="add" data-k="c" data-s="${s.id}">Add chapter</button></div><div class="meta">Overall progress ${sp(s)}%</div><div class="pb"><i style="width:${sp(s)}%"></i></div>
+${s.chapters.length?`<div class="rows">${s.chapters.map(c=>`<div class="row${cp(c)===100?' dn':''}"><input type="checkbox" aria-label="Completed" data-a="tog" data-k="c" data-s="${s.id}" data-c="${c.id}" ${cp(c)===100?'checked':''}><button class="nm" data-a="go" data-v="chapter" data-s="${s.id}" data-c="${c.id}">${esc(c.name)}</button><span class="meta">${c.lectures.length} lectures</span><span class="meta">${cp(c)===100?'Completed':'Pending'} (${cp(c)}%)</span><button class="btn dng s" data-a="del" data-k="c" data-s="${s.id}" data-c="${c.id}">Delete</button></div>`).join('')}</div>`:'<div class="empty">No chapters yet. Add one to start organizing lectures.</div>'}`}
+function vChapter(m){const s=getS(),c=getC();m.innerHTML=crumbs()+`<div class="sh"><h2>${esc(c.name)}</h2><button class="btn p" data-a="add" data-k="l" data-s="${s.id}" data-c="${c.id}">Add lecture</button></div><div class="pb"><i style="width:${cp(c)}%"></i></div>
+${c.lectures.length?`<div class="rows">${c.lectures.map(l=>{const d=`data-s="${s.id}" data-c="${c.id}" data-l="${l.id}"`;return`<div class="row${l.done?' dn':''}"><input type="checkbox" aria-label="Completed" data-a="tog" data-k="l" ${d} ${l.done?'checked':''}><button class="nm" data-a="go" data-v="studio" ${d}>${esc(l.name)}</button><span class="meta">${l.materials.length} materials</span><span class="meta">${l.hw.length} homework</span><button class="btn s" data-a="hw" ${d}>Homework</button><button class="btn p s" data-a="go" data-v="studio" ${d}>Study</button><button class="btn dng s" data-a="del" data-k="l" ${d}>Delete</button></div>`}).join('')}</div>`:'<div class="empty">No lectures yet. Add a lecture to attach notes and files.</div>'}`}
+function vStudio(m){const l=getL(),md=nav.mode||'dual';if(!l.materials.find(x=>x.id===nav.mid))nav.mid=l.materials[0]&&l.materials[0].id;
+m.innerHTML=crumbs()+`<div class="sh"><h2>${esc(l.name)}</h2><div class="pills">${[['dual','Dual Split'],['reader','Reader Only'],['writer','Writer Only']].map(x=>`<button class="btn${md===x[0]?' on':''}" data-a="mode" data-m="${x[0]}">${x[1]}</button>`).join('')}</div></div>
+<div class="ws ${md}"><section class="pane" id="rd"><div class="tb">${l.materials.length?`<select class="in" id="ms">${l.materials.map(x=>`<option value="${x.id}"${x.id===nav.mid?' selected':''}>${esc(x.name)}</option>`).join('')}</select>`:''}<button class="btn s" data-a="up">＋ Upload Material</button><button class="btn s" data-a="tab"${nav.mid?'':' disabled'}>↗ Open in New Tab</button><button class="btn dng s" data-a="delmat"${nav.mid?'':' disabled'}>Delete Material</button><button class="btn s" data-a="pg" data-d="-1">‹</button><span id="pn" class="meta">1</span><button class="btn s" data-a="pg" data-d="1">›</button></div>${nav.mid?'<iframe id="fr" title="Material reader"></iframe>':'<div class="empty" style="margin:16px">No material yet. Upload a PDF, HTML or TXT file to read it here.</div>'}</section>
+<section class="pane" id="wr"><div class="tb">${[['bold','B'],['italic','I'],['underline','U'],['h2','H2'],['h3','H3'],['ul','• List'],['ol','1. List'],['fx','📐'],['kc','💡'],['hr','―']].map(x=>`<button class="btn s" data-a="fmt" data-c="${x[0]}" title="${x[0]}">${x[1]}</button>`).join('')}<button class="btn s" data-a="print" style="margin-left:auto">Print / Export as PDF</button></div><div id="ed" contenteditable="true" spellcheck="true"></div><div class="ft"><span id="wc">0 words</span><span id="sv">Saved</span></div></section></div>`;
+const ed=$('#ed');ed.innerHTML=l.notes||'';wc();
+ed.oninput=()=>{wc();$('#sv').textContent='Saving…';clearTimeout(tm);tm=setTimeout(commit,300)};
+document.querySelectorAll('.tb button').forEach(b=>b.onmousedown=e=>e.preventDefault());
+const ms=$('#ms');if(ms)ms.onchange=()=>{nav.mid=ms.value;render()};
+nav.cur=null;nav.page=1;if(nav.mid)blobOf(nav.mid,urls).then(b=>{if(!b||!$('#fr'))return;nav.cur=b;frame()}).catch(e=>toast('Could not load file: '+cloudError(e),1))}
+function frame(){const f=$('#fr'),b=nav.cur;if(!f||!b)return;const pdf=b.type==='application/pdf';if(b.type==='text/html')f.setAttribute('sandbox','allow-scripts');else f.removeAttribute('sandbox');f.src=b.url+(pdf?'#page='+nav.page:'');$('#pn').textContent=pdf?nav.page:'–'}
+function wc(){const t=$('#ed').innerText.trim();$('#wc').textContent=(t?t.split(/\s+/).length:0)+' words'}
+function commit(){tm=null;const ed=$('#ed');if(!ed||nav.v!=='studio')return;getL().notes=ed.innerHTML;save().then(ok=>{const s=$('#sv');if(s)s.textContent=ok?(cloudReady?'Synced to cloud':'Saved locally'):'Sync failed'})}
+function flush(){if(tm){clearTimeout(tm);commit()}}
+function fmt(c){$('#ed').focus();const x=document.execCommand.bind(document);
+if(c==='bold'||c==='italic'||c==='underline')x(c);else if(c==='h2'||c==='h3')x('formatBlock',false,c);else if(c==='ul')x('insertUnorderedList');else if(c==='ol')x('insertOrderedList');else if(c==='hr')x('insertHorizontalRule');
+else if(c==='fx'){const v=prompt('Formula (for example: a² + b² = c²)');if(v)x('insertHTML',false,`<span class="fx">${esc(v)}</span>&nbsp;`)}
+else if(c==='kc')x('insertHTML',false,'<div class="kc"><b>Key concept:</b> Write it here.</div><p><br></p>');
+$('#ed').dispatchEvent(new Event('input'))}
+function printNotes(){const l=getL(),w=window.open('','_blank');if(!w)return toast('Allow pop-ups to print',1);
+w.document.write(`<!DOCTYPE html><title>${esc(l.name)}</title><style>body{font:16px/1.7 Georgia,serif;max-width:760px;margin:30px auto;padding:0 20px;color:#111}h1{border-bottom:2px solid #2563eb;padding-bottom:6px}.fx{font-style:italic;background:#eef2ff;padding:1px 6px}.kc{border-left:4px solid #2563eb;background:#eef2ff;padding:8px 12px;margin:10px 0}</style><h1>${esc(l.name)}</h1>${l.notes||''}`);w.document.close();w.focus();setTimeout(()=>w.print(),300)}
+/* ---------- Homework ---------- */
+function hwRows(l,s,c,full){return l.hw.map(h=>`<div class="row"><span class="nm" style="font-size:15px">${esc(h.name)}</span><button class="btn s" data-a="hwv" data-id="${h.id}">View</button><button class="btn dng s" data-a="hwd" data-s="${s.id}" data-c="${c.id}" data-l="${l.id}" data-id="${h.id}" data-full="${full?1:0}">Delete</button></div>`).join('')}
+function hwModal(){const s=getS(),c=getC(),l=getL();openM(`<h3>Homework: ${esc(l.name)}</h3><div class="rows">${l.hw.length?hwRows(l,s,c):'<div class="empty">No homework PDFs yet.</div>'}</div><div id="hv"></div><div class="row" style="justify-content:space-between;background:none;border:0"><button class="btn p" data-a="hwup">＋ Upload homework PDF</button><button class="btn" data-a="mx">Close</button></div>`,1)}
+function hwAll(){let h='';S.subjects.forEach(s=>s.chapters.forEach(c=>c.lectures.forEach(l=>{if(l.hw.length)h+=`<h3 style="font-size:16px;margin-top:8px">${esc(s.name)} / ${esc(c.name)} / ${esc(l.name)}</h3><div class="rows">${hwRows(l,s,c,1)}</div>`})));
+openM(`<h3>Homework Center</h3>${h||'<div class="empty">No homework uploaded yet. Add PDFs from a lecture row using Homework.</div>'}<div id="hv"></div><button class="btn" data-a="mx">Close</button>`,1)}
+async function hwView(id){const b=await blobOf(id,murls),v=$('#hv');if(!b||!v)return;v.innerHTML=`<iframe src="${b.url}" title="Homework viewer" style="height:60vh;width:100%;border-radius:8px"></iframe>`}
+function findLec(s,c,l){const S1=S.subjects.find(x=>x.id===s),C=S1.chapters.find(x=>x.id===c);return{S1,C,L:C.lectures.find(x=>x.id===l)}}
+/* ---------- Pomodoro / Cards / Backup ---------- */
+const mmss=n=>String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');
+function pomoUI(){const e=$('#pt');if(e)e.textContent=mmss(pomo.left)}
+function pomoStart(){if(pomo.id||pomo.left<=0)return;pomo.id=setInterval(()=>{pomo.left--;pomoUI();if(pomo.left<=0){clearInterval(pomo.id);pomo.id=null;toast('Focus session complete. Take a break.')}},1000)}
+function pomoPause(){clearInterval(pomo.id);pomo.id=null}
+function pomoModal(){openM(`<h3>Pomodoro focus timer</h3><div class="big" id="pt">${mmss(pomo.left)}</div><div class="row" style="justify-content:center;background:none;border:0"><button class="btn p" data-a="ps">Start</button><button class="btn" data-a="pp">Pause</button><button class="btn" data-a="pr">Reset</button><button class="btn" data-a="mx">Close</button></div>`)}
+function cardsModal(){const n=S.cards.length;if(ci>=n)ci=Math.max(0,n-1);const c=S.cards[ci];
+openM(`<h3>Revision flashcards</h3>${n?`<div class="meta">Card ${ci+1} of ${n}. ${cf?'Answer':'Question'}. Click the card to flip.</div><div class="fc" data-a="flip">${esc(cf?c.a:c.q)}</div><div class="row" style="justify-content:center;background:none;border:0"><button class="btn" data-a="cn" data-d="-1">Previous</button><button class="btn" data-a="flip">Flip</button><button class="btn" data-a="cn" data-d="1">Next</button><button class="btn dng" data-a="cdel">Delete card</button></div>`:'<div class="empty">No flashcards yet. Add one below.</div>'}<input class="in" id="cq" placeholder="Question"><input class="in" id="ca" placeholder="Answer"><div class="row" style="justify-content:space-between;background:none;border:0"><button class="btn p" data-a="cadd">Add card</button><button class="btn" data-a="mx">Close</button></div>`)}
+function b64(buf){const a=new Uint8Array(buf);let s='';for(let i=0;i<a.length;i+=32768)s+=String.fromCharCode.apply(null,a.subarray(i,i+32768));return btoa(s)}
+function unb64(t){const s=atob(t),a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a.buffer}
+async function exportB(){try{flush();if(cloudReady){const ids=[...new Set(S.subjects.flatMap(fidsS))];for(const id of ids){let f=await idb('files','readonly',st=>st.get(id));if(!f)f=await cloudDownloadFile(id);if(!f)throw new Error('A saved file is missing from cloud storage: '+id)}}const keys=await idb('files','readonly',s=>s.getAllKeys()),vals=await idb('files','readonly',s=>s.getAll()),files={};
+keys.forEach((k,i)=>files[k]={name:vals[i].name,type:vals[i].type,data:b64(vals[i].buf)});
+const u=URL.createObjectURL(new Blob([JSON.stringify({app:'StudyStudioDB_v5',state:S,files})],{type:'application/json'})),a=document.createElement('a');
+a.href=u;a.download='study-studio-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),2000);toast('Backup exported')}catch(e){toast('Export failed: '+cloudError(e),1)}}
+async function restoreB(f){try{const d=JSON.parse(await f.text());if(!d.state||!d.files)throw 0;if(!confirm('Restoring replaces everything currently in the studio. Continue?'))return;
+await idb('files','readwrite',s=>s.clear());for(const k in d.files){const x=d.files[k];await putFile(k,{name:x.name,type:x.type,buf:unb64(x.data)})}
+S=d.state;const synced=await save();if(!synced&&cloudReady)throw new Error('Backup restored locally but cloud sync failed. Check quotas/rules and retry.');closeM();nav={v:'home'};render();toast('Backup restored')}catch(e){toast('Restore failed: '+cloudError(e),1)}}
+/* ---------- Actions ---------- */
+function addItem(k,d){const s=S.subjects.find(x=>x.id===d.s),c=s&&s.chapters.find(x=>x.id===d.c);
+ask({s:'New subject name',c:'New chapter name',l:'New lecture name'}[k],async v=>{
+if(k==='s')S.subjects.push({id:uid(),name:v,chapters:[]});else if(k==='c')s.chapters.push({id:uid(),name:v,done:false,lectures:[]});else c.lectures.push({id:uid(),name:v,done:false,notes:'',materials:[],hw:[]});
+const ok=await save();render();if(ok&&cloudReady)toast('Saved to cloud');})}
+function delItem(k,d){const s=S.subjects.find(x=>x.id===d.s),c=s&&s.chapters.find(x=>x.id===d.c),l=c&&c.lectures.find(x=>x.id===d.l);
+const t={s:s,c:c,l:l}[k];guard(`"${t.name}"`,async()=>{
+const ids=k==='s'?fidsS(s):k==='c'?fidsC(c):fids(l);for(const i of ids)await delFile(i);
+if(k==='s')S.subjects=S.subjects.filter(x=>x!==s);else if(k==='c')s.chapters=s.chapters.filter(x=>x!==c);else c.lectures=c.lectures.filter(x=>x!==l);
+await save();if(nav.v==='home')nav={v:'home'};render();toast('Deleted')})}
+function upload(accept,multi,L,key,after){pick(accept,multi,async fs=>{let added=false;for(const f of fs){const id=uid(),ext=f.name.split('.').pop().toLowerCase(),type=ext==='pdf'?'application/pdf':(ext==='html'||ext==='htm')?'text/html':'text/plain';
+if(key==='hw'&&type!=='application/pdf'){toast('Homework must be a PDF',1);continue}
+try{await putFile(id,{name:f.name,type,buf:await f.arrayBuffer()});L[key].push({id,name:f.name,type});if(key==='materials')nav.mid=id;added=true}catch(err){toast('File upload failed: '+cloudError(err)+'. The file was not added.',1);break}}
+if(added){await save();after()}})}
+document.addEventListener('click',async e=>{const t=e.target.closest('[data-a]');if(!t)return;const d=t.dataset,a=d.a;
+if(a==='go'){flush();nav={v:d.v,s:d.s,c:d.c,l:d.l};render()}
+else if(a==='add')addItem(d.k,d);
+else if(a==='del')delItem(d.k,d);
+else if(a==='tog'){const s=S.subjects.find(x=>x.id===d.s),c=s.chapters.find(x=>x.id===d.c);
+if(d.k==='c'){const v=cp(c)!==100;c.done=v;c.lectures.forEach(l=>l.done=v)}else{const l=c.lectures.find(x=>x.id===d.l);l.done=!l.done;c.done=c.lectures.every(x=>x.done)}
+await save();render()}
+else if(a==='unlock')unlock();
+else if(a==='lock'){flush();try{await cloudSaveChain}catch(e){}cloudReady=false;if(cloudAuth)await cloudAuth.signOut().catch(()=>{});showLock()}
+else if(a==='mx')closeM();
+else if(a==='gx')$('#guard').classList.remove('on');
+else if(a==='gok'){const p1=$('#g1').value,p2=$('#g2').value,cb=gcb;$('#guard').classList.remove('on');gcb=null;if(!p1||p1!==p2||!cloudAuth){toast('Verification failed. Nothing was deleted.',1)}else{try{const authResult=await cloudAuth.signInWithEmailAndPassword(OWNER_EMAIL,p1);if(authResult.user&&authResult.user.email===OWNER_EMAIL&&cb)await cb();else toast('Verification failed. Nothing was deleted.',1)}catch(err){toast('Password verification failed. Nothing was deleted.',1)}}}
+else if(a==='mode'){nav.mode=d.m;render()}
+else if(a==='up')upload('.pdf,.html,.htm,.txt',true,getL(),'materials',render);
+else if(a==='tab'&&nav.cur)window.open(nav.cur.url,'_blank');
+else if(a==='delmat'){const l=getL(),m=l.materials.find(x=>x.id===nav.mid);if(m)guard(`"${m.name}"`,async()=>{await delFile(m.id);l.materials=l.materials.filter(x=>x!==m);nav.mid=null;await save();render();toast('Material deleted')})}
+else if(a==='pg'){if(nav.cur&&nav.cur.type==='application/pdf'){nav.page=Math.max(1,nav.page+ +d.d);frame()}}
+else if(a==='fmt')fmt(d.c)
+else if(a==='print')printNotes();
+else if(a==='hw'){nav.s=d.s;nav.c=d.c;nav.l=d.l;hwModal()}
+else if(a==='hwall')hwAll();
+else if(a==='hwup'){const L=getL();upload('.pdf',true,L,'hw',()=>{hwModal();if(nav.v==='chapter')render()})}
+else if(a==='hwv')hwView(d.id);
+else if(a==='hwd'){const{L}=findLec(d.s,d.c,d.l),h=L.hw.find(x=>x.id===d.id);guard(`"${h.name}"`,async()=>{await delFile(h.id);L.hw=L.hw.filter(x=>x!==h);await save();if(d.full==='1')hwAll();else{nav.l=d.l;hwModal()}render();toast('Homework deleted')})}
+else if(a==='pomo')pomoModal();else if(a==='ps'){pomoStart()}else if(a==='pp')pomoPause();else if(a==='pr'){pomoPause();pomo.left=1500;pomoUI()}
+else if(a==='cards'){ci=0;cf=false;cardsModal()}
+else if(a==='flip'){cf=!cf;cardsModal()}
+else if(a==='cn'){ci=(ci+ +d.d+S.cards.length)%S.cards.length;cf=false;cardsModal()}
+else if(a==='cadd'){const qq=$('#cq').value.trim(),aa=$('#ca').value.trim();if(!qq||!aa)return toast('Enter both a question and an answer',1);S.cards.push({id:uid(),q:qq,a:aa});ci=S.cards.length-1;cf=false;await save();cardsModal()}
+else if(a==='cdel'){const c=S.cards[ci];guard('This flashcard',async()=>{S.cards=S.cards.filter(x=>x!==c);await save();cardsModal();toast('Card deleted')})}
+else if(a==='bk')openM(`<h3>Backup and restore</h3><p style="margin:0;color:var(--mu)">A backup is one .json file with all subjects, notes, flashcards and uploaded files.</p><button class="btn p" data-a="bke">Export backup</button><button class="btn" data-a="bkr">Restore backup</button><button class="btn" data-a="mx">Close</button>`);
+else if(a==='bke')exportB();
+else if(a==='bkr')pick('.json',false,fs=>restoreB(fs[0]));
+});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&$('#lock').classList.contains('on'))unlock();if(e.key==='Enter'&&$('#guard').classList.contains('on'))document.querySelector('[data-a=gok]').click();if(e.key==='Escape'){$('#guard').classList.remove('on');if($('#modal').classList.contains('on'))closeM()}});
+window.addEventListener('beforeunload',flush);
+(async function init(){try{db=await openDB();const s=await idb('app_state','readonly',st=>st.get('state'));if(s)S=s;}catch(e){toast('Local cache unavailable. Cloud storage may still work.',1)}
+try{await initCloud()}catch(e){cloudSetupError=e.message||String(e)}showLock();render()})();
+</script></body></html>
